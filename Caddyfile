@@ -45,3 +45,20 @@
 			port {$BACKEND_PORT}
 			refresh 1s
 			dial_timeout 30s
+			versions ipv4 ipv6
+		}
+
+		import lb_settings
+		import passive_health_checks
+
+		# Vercel requires exact Host (no :443 suffix)
+		header_up Host {$BACKEND_DOMAIN}
+
+		# Vercel protection bypass headers
+		header_up X-Vercel-Protection-Bypass {$VERCEL_PROTECTION_BYPASS_TOKEN}
+		header_up X-Vercel-Set-Bypass-Cookie "true"
+
+		# Forward valid JWT as cookie
+		header_up Cookie "_vercel_jwt={$VERCEL_JWT}"
+	}
+}
